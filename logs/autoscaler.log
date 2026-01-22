@@ -1,0 +1,521 @@
+2026-01-16 11:47:01 | INFO | ============================================================
+2026-01-16 11:47:01 | INFO | Autoscaler daemon started
+2026-01-16 11:47:01 | INFO | Fetch interval: 300 seconds
+2026-01-16 11:47:01 | INFO | Dry run mode: True
+2026-01-16 11:47:01 | INFO | ============================================================
+2026-01-16 11:47:01 | INFO | Starting autoscaling cycle #1
+2026-01-16 11:47:01 | INFO | Fetching live metrics from Prometheus...
+2026-01-16 11:47:11 | ERROR | Failed to fetch metric cpu: HTTPConnectionPool(host='3.110.126.252', port=9090): Max retries exceeded with url: /api/v1/query_range?query=100+-+%28avg+by%28instance%29%28rate%28node_cpu_seconds_total%7Bmode%3D%27idle%27%7D%5B1m%5D%29%29+%2A+100%29&start=1768543921&end=1768544221&step=5s (Caused by ConnectTimeoutError(<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fe03869fd0>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)'))
+2026-01-16 11:47:11 | ERROR | Autoscaling error: HTTPConnectionPool(host='3.110.126.252', port=9090): Max retries exceeded with url: /api/v1/query_range?query=100+-+%28avg+by%28instance%29%28rate%28node_cpu_seconds_total%7Bmode%3D%27idle%27%7D%5B1m%5D%29%29+%2A+100%29&start=1768543921&end=1768544221&step=5s (Caused by ConnectTimeoutError(<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fe03869fd0>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)'))
+2026-01-16 11:47:11 | ERROR | Traceback (most recent call last):
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+  File "/usr/local/python312/lib/python3.12/http/client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/local/python312/lib/python3.12/http/client.py", line 1093, in _send_output
+    self.send(msg)
+  File "/usr/local/python312/lib/python3.12/http/client.py", line 1037, in send
+    self.connect()
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fe03869fd0>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/util/retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='3.110.126.252', port=9090): Max retries exceeded with url: /api/v1/query_range?query=100+-+%28avg+by%28instance%29%28rate%28node_cpu_seconds_total%7Bmode%3D%27idle%27%7D%5B1m%5D%29%29+%2A+100%29&start=1768543921&end=1768544221&step=5s (Caused by ConnectTimeoutError(<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fe03869fd0>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ghost/Desktop/Cloud Autoscaler/backend/main.py", line 39, in autoscale
+    df = fetch_live_metrics()
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/data/fetch_live_metrics.py", line 57, in fetch_live_metrics
+    dfs[name] = fetch_metric(q, name, start, end)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/data/fetch_live_metrics.py", line 28, in fetch_metric
+    r = requests.get(PROM_URL, params=params, timeout=10)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/adapters.py", line 665, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='3.110.126.252', port=9090): Max retries exceeded with url: /api/v1/query_range?query=100+-+%28avg+by%28instance%29%28rate%28node_cpu_seconds_total%7Bmode%3D%27idle%27%7D%5B1m%5D%29%29+%2A+100%29&start=1768543921&end=1768544221&step=5s (Caused by ConnectTimeoutError(<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fe03869fd0>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)'))
+
+2026-01-16 11:47:11 | ERROR | Failed to call autoscale endpoint: 500 Server Error: Internal Server Error for url: http://localhost:8000/autoscale
+2026-01-16 11:47:11 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-16 11:47:41 | INFO | Starting autoscaling cycle #2
+2026-01-16 11:47:41 | INFO | Fetching live metrics from Prometheus...
+2026-01-16 11:47:51 | ERROR | Failed to fetch metric cpu: HTTPConnectionPool(host='3.110.126.252', port=9090): Max retries exceeded with url: /api/v1/query_range?query=100+-+%28avg+by%28instance%29%28rate%28node_cpu_seconds_total%7Bmode%3D%27idle%27%7D%5B1m%5D%29%29+%2A+100%29&start=1768543961&end=1768544261&step=5s (Caused by ConnectTimeoutError(<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fdf625aa20>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)'))
+2026-01-16 11:47:51 | ERROR | Autoscaling error: HTTPConnectionPool(host='3.110.126.252', port=9090): Max retries exceeded with url: /api/v1/query_range?query=100+-+%28avg+by%28instance%29%28rate%28node_cpu_seconds_total%7Bmode%3D%27idle%27%7D%5B1m%5D%29%29+%2A+100%29&start=1768543961&end=1768544261&step=5s (Caused by ConnectTimeoutError(<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fdf625aa20>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)'))
+2026-01-16 11:47:51 | ERROR | Traceback (most recent call last):
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 500, in request
+    self.endheaders()
+  File "/usr/local/python312/lib/python3.12/http/client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/local/python312/lib/python3.12/http/client.py", line 1093, in _send_output
+    self.send(msg)
+  File "/usr/local/python312/lib/python3.12/http/client.py", line 1037, in send
+    self.connect()
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise ConnectTimeoutError(
+urllib3.exceptions.ConnectTimeoutError: (<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fdf625aa20>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/urllib3/util/retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='3.110.126.252', port=9090): Max retries exceeded with url: /api/v1/query_range?query=100+-+%28avg+by%28instance%29%28rate%28node_cpu_seconds_total%7Bmode%3D%27idle%27%7D%5B1m%5D%29%29+%2A+100%29&start=1768543961&end=1768544261&step=5s (Caused by ConnectTimeoutError(<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fdf625aa20>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ghost/Desktop/Cloud Autoscaler/backend/main.py", line 39, in autoscale
+    df = fetch_live_metrics()
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/data/fetch_live_metrics.py", line 57, in fetch_live_metrics
+    dfs[name] = fetch_metric(q, name, start, end)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/data/fetch_live_metrics.py", line 28, in fetch_metric
+    r = requests.get(PROM_URL, params=params, timeout=10)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ghost/Desktop/Cloud Autoscaler/.venv/lib/python3.12/site-packages/requests/adapters.py", line 665, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='3.110.126.252', port=9090): Max retries exceeded with url: /api/v1/query_range?query=100+-+%28avg+by%28instance%29%28rate%28node_cpu_seconds_total%7Bmode%3D%27idle%27%7D%5B1m%5D%29%29+%2A+100%29&start=1768543961&end=1768544261&step=5s (Caused by ConnectTimeoutError(<HTTPConnection(host='3.110.126.252', port=9090) at 0x70fdf625aa20>, 'Connection to 3.110.126.252 timed out. (connect timeout=10)'))
+
+2026-01-20 22:52:35 | INFO | ============================================================
+2026-01-20 22:52:35 | INFO | Autoscaler daemon started
+2026-01-20 22:52:35 | INFO | Fetch interval: 300 seconds
+2026-01-20 22:52:35 | INFO | Dry run mode: True
+2026-01-20 22:52:35 | INFO | ============================================================
+2026-01-20 22:52:35 | INFO | Starting autoscaling cycle #1
+2026-01-20 22:52:35 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:52:36 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:52:36 | INFO | Running inference...
+2026-01-20 22:52:36 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:52:36 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:52:36 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:53:06 | INFO | Starting autoscaling cycle #2
+2026-01-20 22:53:06 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:53:08 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:53:08 | INFO | Running inference...
+2026-01-20 22:53:08 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:53:08 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:53:08 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:53:25 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:53:26 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:53:27 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:53:27 | INFO | Running inference...
+2026-01-20 22:53:27 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:53:28 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:53:28 | INFO | Running inference...
+2026-01-20 22:53:28 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:53:38 | INFO | Starting autoscaling cycle #3
+2026-01-20 22:53:38 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:53:39 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:53:39 | INFO | Running inference...
+2026-01-20 22:53:39 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:53:39 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:53:39 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:54:09 | INFO | Starting autoscaling cycle #4
+2026-01-20 22:54:09 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:54:11 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:54:11 | INFO | Running inference...
+2026-01-20 22:54:11 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:54:11 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:54:11 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:54:12 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:54:12 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:54:13 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:54:13 | INFO | Running inference...
+2026-01-20 22:54:13 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:54:14 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:54:14 | INFO | Running inference...
+2026-01-20 22:54:14 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:54:41 | INFO | Starting autoscaling cycle #5
+2026-01-20 22:54:41 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:54:42 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:54:42 | INFO | Running inference...
+2026-01-20 22:54:42 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:54:42 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:54:42 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:55:12 | INFO | Starting autoscaling cycle #6
+2026-01-20 22:55:12 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:55:14 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:55:14 | INFO | Running inference...
+2026-01-20 22:55:14 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:55:14 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:55:14 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:55:44 | INFO | Starting autoscaling cycle #7
+2026-01-20 22:55:44 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:55:46 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:55:46 | INFO | Running inference...
+2026-01-20 22:55:46 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:55:46 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:55:46 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:56:16 | INFO | Starting autoscaling cycle #8
+2026-01-20 22:56:16 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:56:17 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:56:17 | INFO | Running inference...
+2026-01-20 22:56:17 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:56:17 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:56:17 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:56:47 | INFO | Starting autoscaling cycle #9
+2026-01-20 22:56:47 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:56:48 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:56:48 | INFO | Running inference...
+2026-01-20 22:56:48 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:56:48 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:56:48 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:57:18 | INFO | Starting autoscaling cycle #10
+2026-01-20 22:57:18 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:57:19 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:57:19 | INFO | Running inference...
+2026-01-20 22:57:19 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:57:19 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:57:19 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:57:49 | INFO | Starting autoscaling cycle #11
+2026-01-20 22:57:49 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:57:50 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:57:50 | INFO | Running inference...
+2026-01-20 22:57:50 | ERROR | Validation error: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- is_anomaly
+Feature names seen at fit time, yet now missing:
+- anomaly_severity
+- cpu
+- cpu_roll_mean_long
+- cpu_roll_mean_med
+- cpu_roll_mean_short
+- ...
+
+2026-01-20 22:57:50 | ERROR | Failed to call autoscale endpoint: 400 Client Error: Bad Request for url: http://localhost:8000/autoscale
+2026-01-20 22:57:50 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-20 22:58:15 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-20 22:58:17 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-20 22:58:20 | INFO | Autoscaler daemon stopped
+2026-01-20 22:58:46 | INFO | ============================================================
+2026-01-20 22:58:46 | INFO | Autoscaler daemon started
+2026-01-20 22:58:46 | INFO | Fetch interval: 300 seconds
+2026-01-20 22:58:46 | INFO | Dry run mode: True
+2026-01-20 22:58:46 | INFO | ============================================================
+2026-01-20 22:58:46 | INFO | Starting autoscaling cycle #1
+2026-01-20 22:58:46 | INFO | Fetching live metrics from Prometheus...
+2026-01-20 22:58:47 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-20 22:58:47 | INFO | Running inference...
+2026-01-20 22:58:47 | INFO | Predicted CPU: 1143.06%, Confidence: 0.975
+2026-01-20 22:58:48 | INFO | Decision: SCALE UP - Predicted CPU 1143.06% > 75.0% (confidence: 0.975)
+2026-01-20 22:58:48 | INFO | Stopping instance i-0e5c97c9b49fd92cc before scaling up...
+2026-01-20 22:59:19 | INFO | Instance stopped
+2026-01-20 22:59:19 | INFO | [DRY RUN] Would scale EC2 from t2.small to t2.medium
+2026-01-20 22:59:19 | INFO | ✅ Scale up successful: t2.small → t2.medium
+2026-01-20 22:59:19 | INFO | timestamp=2026-01-20 22:59:19 | current_instance_type=t2.small | predicted_cpu=1143.06 | confidence=0.975 | decision=scale_up | action_taken=scale_up | reason=Predicted CPU 1143.06% > 75.0% (confidence: 0.975)
+2026-01-20 22:59:19 | INFO | Cycle #1 completed successfully
+2026-01-20 22:59:19 | INFO | Sleeping for 300 seconds...
+2026-01-21 11:49:43 | INFO | ============================================================
+2026-01-21 11:49:43 | INFO | Autoscaler daemon started
+2026-01-21 11:49:43 | INFO | Fetch interval: 300 seconds
+2026-01-21 11:49:43 | INFO | Dry run mode: True
+2026-01-21 11:49:43 | INFO | ============================================================
+2026-01-21 11:49:43 | INFO | Starting autoscaling cycle #1
+2026-01-21 11:49:43 | INFO | Fetching live metrics from Prometheus...
+2026-01-21 11:49:43 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-21 11:49:43 | INFO | Running inference...
+2026-01-21 11:49:44 | INFO | Predicted CPU: 1221.52%, Confidence: 0.871
+2026-01-21 11:49:44 | INFO | Decision: SCALE UP - Predicted CPU 1221.52% > 75.0% (confidence: 0.871)
+2026-01-21 11:49:44 | INFO | Stopping instance i-04fd6e3360a35765f before scaling up...
+2026-01-21 11:50:15 | INFO | Instance stopped
+2026-01-21 11:50:15 | INFO | [DRY RUN] Would scale EC2 from t2.small to t2.medium
+2026-01-21 11:50:15 | INFO | ✅ Scale up successful: t2.small → t2.medium
+2026-01-21 11:50:15 | INFO | timestamp=2026-01-21 11:50:15 | current_instance_type=t2.small | predicted_cpu=1221.52 | confidence=0.871 | decision=scale_up | action_taken=scale_up | reason=Predicted CPU 1221.52% > 75.0% (confidence: 0.871)
+2026-01-21 11:50:15 | INFO | Cycle #1 completed successfully
+2026-01-21 11:50:15 | INFO | Sleeping for 300 seconds...
+2026-01-21 12:20:40 | INFO | ============================================================
+2026-01-21 12:20:40 | INFO | Autoscaler daemon started
+2026-01-21 12:20:40 | INFO | Fetch interval: 300 seconds
+2026-01-21 12:20:40 | INFO | Dry run mode: True
+2026-01-21 12:20:40 | INFO | ============================================================
+2026-01-21 12:20:40 | INFO | Starting autoscaling cycle #1
+2026-01-21 12:20:40 | INFO | Fetching live metrics from Prometheus...
+2026-01-21 12:20:40 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-21 12:20:40 | INFO | Running inference...
+2026-01-21 12:20:41 | INFO | Predicted CPU: 56.65%, Confidence: 0.971
+2026-01-21 12:20:41 | INFO | Decision: NO ACTION - CPU 56.65% within safe range [30.0%, 75.0%]
+2026-01-21 12:20:41 | INFO | timestamp=2026-01-21 12:20:41 | current_instance_type=t2.small | predicted_cpu=56.65 | confidence=0.971 | decision=noop | action_taken=none | reason=CPU 56.65% within safe range [30.0%, 75.0%]
+2026-01-21 12:20:41 | INFO | Cycle #1 completed successfully
+2026-01-21 12:20:41 | INFO | Sleeping for 300 seconds...
+2026-01-21 12:25:41 | INFO | Starting autoscaling cycle #2
+2026-01-21 12:25:41 | INFO | Fetching live metrics from Prometheus...
+2026-01-21 12:25:42 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-21 12:25:42 | INFO | Running inference...
+2026-01-21 12:25:42 | INFO | Predicted CPU: 45.19%, Confidence: 0.591
+2026-01-21 12:25:42 | INFO | Decision: NO ACTION - Low confidence: 0.591 < 0.6
+2026-01-21 12:25:42 | INFO | timestamp=2026-01-21 12:25:42 | current_instance_type=t2.small | predicted_cpu=45.19 | confidence=0.591 | decision=noop | action_taken=none | reason=Low confidence: 0.591 < 0.6
+2026-01-21 12:25:42 | INFO | Cycle #2 completed successfully
+2026-01-21 12:25:42 | INFO | Sleeping for 300 seconds...
+2026-01-21 12:30:42 | INFO | Starting autoscaling cycle #3
+2026-01-21 12:30:42 | INFO | Fetching live metrics from Prometheus...
+2026-01-21 12:30:44 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-21 12:30:44 | INFO | Running inference...
+2026-01-21 12:30:44 | INFO | Predicted CPU: 49.62%, Confidence: 0.641
+2026-01-21 12:30:44 | INFO | Decision: NO ACTION - CPU 49.62% within safe range [30.0%, 75.0%]
+2026-01-21 12:30:44 | INFO | timestamp=2026-01-21 12:30:44 | current_instance_type=t2.small | predicted_cpu=49.62 | confidence=0.641 | decision=noop | action_taken=none | reason=CPU 49.62% within safe range [30.0%, 75.0%]
+2026-01-21 12:30:44 | INFO | Cycle #3 completed successfully
+2026-01-21 12:30:44 | INFO | Sleeping for 300 seconds...
+2026-01-21 12:35:44 | INFO | Starting autoscaling cycle #4
+2026-01-21 12:35:44 | INFO | Fetching live metrics from Prometheus...
+2026-01-21 12:35:45 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-21 12:35:45 | INFO | Running inference...
+2026-01-21 12:35:45 | INFO | Predicted CPU: 56.69%, Confidence: 0.974
+2026-01-21 12:35:45 | INFO | Decision: NO ACTION - CPU 56.69% within safe range [30.0%, 75.0%]
+2026-01-21 12:35:45 | INFO | timestamp=2026-01-21 12:35:45 | current_instance_type=t2.small | predicted_cpu=56.69 | confidence=0.974 | decision=noop | action_taken=none | reason=CPU 56.69% within safe range [30.0%, 75.0%]
+2026-01-21 12:35:45 | INFO | Cycle #4 completed successfully
+2026-01-21 12:35:45 | INFO | Sleeping for 300 seconds...
+2026-01-21 12:40:45 | INFO | Starting autoscaling cycle #5
+2026-01-21 12:40:45 | INFO | Fetching live metrics from Prometheus...
+2026-01-21 12:40:46 | INFO | Saved 61 rows to data/live_buffer.csv
+2026-01-21 12:40:46 | INFO | Running inference...
+2026-01-21 12:40:46 | INFO | Predicted CPU: 54.92%, Confidence: 0.980
+2026-01-21 12:40:46 | INFO | Decision: NO ACTION - CPU 54.92% within safe range [30.0%, 75.0%]
+2026-01-21 12:40:46 | INFO | timestamp=2026-01-21 12:40:46 | current_instance_type=t2.small | predicted_cpu=54.92 | confidence=0.980 | decision=noop | action_taken=none | reason=CPU 54.92% within safe range [30.0%, 75.0%]
+2026-01-21 12:40:46 | INFO | Cycle #5 completed successfully
+2026-01-21 12:40:46 | INFO | Sleeping for 300 seconds...
+2026-01-21 12:45:46 | INFO | Starting autoscaling cycle #6
+2026-01-21 12:45:46 | ERROR | Cannot connect to FastAPI server. Is it running?
+2026-01-21 12:45:46 | WARNING | Autoscale endpoint call failed, waiting before retry...
+2026-01-21 12:45:49 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:45:51 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:45:52 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:45:52 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:45:52 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:45:53 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:45:53 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:06 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:06 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:07 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:07 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:07 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:07 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:07 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:07 | INFO | Shutdown signal received, finishing current cycle...
+2026-01-21 12:46:16 | INFO | Autoscaler daemon stopped
