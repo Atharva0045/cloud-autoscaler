@@ -20,6 +20,46 @@ logging.basicConfig(
 
 app = FastAPI(title="AI Cloud Resource Allocator")
 
+# In-memory snapshot of the last autoscale decision.
+LAST_AUTOSCALE_STATUS = {
+    "timestamp": None,
+    "predicted_cpu": None,
+    "confidence": None,
+    "decision": "noop",
+    "reason": None,
+    "current_instance_type": None,
+    "action_taken": None,
+    "dry_run": DRY_RUN,
+}
+
+
+@app.get("/metrics")
+def metrics():
+    """
+    Lightweight metrics endpoint for the dashboard.
+
+    - Fetches recent CPU/RAM/Disk from Prometheus
+    - Does NOT run inference or any scaling logic
+    """
+    try:
+        logging.info("Fetching live metrics from Prometheus for /metrics endpoint...")
+        df = fetch_live_metrics()
+
+        if df.empty:
+            raise ValueError("No metrics returned from Prometheus")
+
+        latest = df.iloc[-1]
+        return {
+            "timestamp": latest["timestamp"].isoformat(),
+            "cpu": float(latest.get("cpu", 0.0)),
+            "ram": float(latest.get("ram", 0.0)),
+            "disk": float(latest.get("disk", 0.0)),
+        }
+    except Exception as e:
+        logging.error(f"/metrics endpoint failed: {e}")
+        logging.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Failed to fetch metrics from Prometheus")
+
 @app.get("/autoscale")
 def autoscale():
     """
@@ -91,7 +131,8 @@ def autoscale():
             logging.info(f"Decision: NO ACTION - {decision['reason']}")
         
         # Structured log entry
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now_dt = datetime.datetime.now()
+        timestamp = now_dt.strftime("%Y-%m-%d %H:%M:%S")
         log_entry = (
             f"timestamp={timestamp} | "
             f"current_instance_type={current_instance_type} | "
@@ -102,18 +143,23 @@ def autoscale():
             f"reason={decision['reason']}"
         )
         logging.info(log_entry)
-        
-        # Return response
-        response = {
+
+        # Snapshot last autoscale status for read-only dashboard access.
+        global LAST_AUTOSCALE_STATUS
+        LAST_AUTOSCALE_STATUS = {
+            "timestamp": now_dt.isoformat(),
             "predicted_cpu": predicted_cpu,
             "confidence": confidence,
             "decision": decision["action"],
             "reason": decision["reason"],
             "current_instance_type": current_instance_type,
             "action_taken": action_taken,
-            "dry_run": DRY_RUN
+            "dry_run": DRY_RUN,
         }
-        
+
+        # Return response
+        response = dict(LAST_AUTOSCALE_STATUS)
+
         if aws_result:
             response["aws_result"] = aws_result
         
@@ -129,6 +175,16 @@ def autoscale():
         logging.error(f"Autoscaling error: {e}")
         logging.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
+
+
+@app.get("/autoscale_status")
+def autoscale_status():
+    """
+    Read-only endpoint exposing the last autoscale decision.
+
+    Safe for the dashboard to poll without triggering any inference or scaling.
+    """
+    return LAST_AUTOSCALE_STATUS
 
 @app.get("/health")
 def health():

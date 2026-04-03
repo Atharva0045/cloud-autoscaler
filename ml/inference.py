@@ -76,10 +76,41 @@ def predict_cpu(csv_path="data/live_buffer.csv"):
     # The y_scaler was only used for LSTM training, not XGBoost.
     y_pred = xgb_model.predict(X_scaled)[0]
 
-    # Calculate confidence based on rolling std
-    # confidence = 1 / (1 + rolling_std_cpu)
+    # Calculate confidence based on coefficient of variation (CV = std/mean)
+    # This normalizes the std by the mean, giving more reasonable confidence values
     rolling_std = latest["cpu_roll_std_past"].values[0]
-    confidence = float(1.0 / (1.0 + rolling_std))
+    
+    # Try to get rolling mean (prefer long-term for stability)
+    # Fallback to median if mean not available
+    if "cpu_roll_mean_long" in latest.columns:
+        rolling_mean = latest["cpu_roll_mean_long"].values[0]
+    elif "cpu_roll_mean_med" in latest.columns:
+        rolling_mean = latest["cpu_roll_mean_med"].values[0]
+    elif "cpu_roll_median_past" in latest.columns:
+        rolling_mean = latest["cpu_roll_median_past"].values[0]
+    else:
+        # Fallback: use current CPU value as proxy for mean
+        rolling_mean = latest["cpu"].values[0] if "cpu" in latest.columns else 50.0
+    
+    # Avoid division by zero or very small mean
+    if rolling_mean < 1.0:
+        # If mean is too small, normalize std by typical CPU range (0-100)
+        # Assume max reasonable std is ~50% of range
+        normalized_std = rolling_std / 50.0
+    else:
+        # Use coefficient of variation (CV = std/mean)
+        # This gives a normalized measure of variability
+        cv = rolling_std / rolling_mean
+        normalized_std = cv
+    
+    # Convert to confidence: lower variability = higher confidence
+    # confidence = 1 / (1 + normalized_std)
+    # Examples:
+    #   CV=0.1 (10% variability) → confidence = 1/(1+0.1) = 0.91 (high)
+    #   CV=0.3 (30% variability) → confidence = 1/(1+0.3) = 0.77 (good)
+    #   CV=0.5 (50% variability) → confidence = 1/(1+0.5) = 0.67 (medium)
+    #   CV=1.0 (100% variability) → confidence = 1/(1+1.0) = 0.5 (low)
+    confidence = float(1.0 / (1.0 + normalized_std))
     confidence = max(0.0, min(1.0, confidence))  # clamp to [0, 1]
     
     return {
