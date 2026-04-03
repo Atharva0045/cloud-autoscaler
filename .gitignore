@@ -10,6 +10,7 @@ __pycache__/
 *.pyzwz
 *.pyzwzw
 
+command.txt
 
 # Logs
 logs
