@@ -41,7 +41,7 @@ def call_autoscale_endpoint():
         print(f"Action Taken: {result.get('action_taken', 'N/A')}")
         print(f"Current Instance: {result.get('current_instance_type', 'N/A')}")
         if DRY_RUN:
-            print(f"⚠️  DRY RUN MODE - No actual scaling performed")
+            print(f"DRY RUN MODE - No actual scaling performed")
         print(f"{'='*60}\n")
         
         return result
@@ -68,7 +68,7 @@ def autoscale_loop():
     logging.info(f"Dry run mode: {DRY_RUN}")
     logging.info("="*60)
     
-    print(f"\n🚀 Autoscaler daemon started")
+    print(f"\nAutoscaler daemon started")
     print(f"   Interval: {FETCH_INTERVAL_SECONDS} seconds ({FETCH_INTERVAL_SECONDS/60:.1f} minutes)")
     print(f"   Dry run: {DRY_RUN}")
     print(f"   Log file: {LOG_FILE}")
@@ -103,7 +103,7 @@ def autoscale_loop():
             time.sleep(FETCH_INTERVAL_SECONDS)
     
     logging.info("Autoscaler daemon stopped")
-    print("\n✅ Autoscaler daemon stopped gracefully")
+    print("\nAutoscaler daemon stopped gracefully")
 
 if __name__ == "__main__":
     import traceback

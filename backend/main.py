@@ -106,7 +106,7 @@ def autoscale():
                 if aws_result.get("success"):
                     action_taken = "scale_up"
                     record_action("scale_up")
-                    logging.info(f"✅ Scale up successful: {aws_result.get('old_type')} -> {aws_result.get('new_type')}")
+                    logging.info(f"Scale up successful: {aws_result.get('old_type')} -> {aws_result.get('new_type')}")
                 else:
                     logging.warning(f"Scale up skipped: {aws_result.get('reason')}")
             except Exception as e:
@@ -120,7 +120,7 @@ def autoscale():
                 if aws_result.get("success"):
                     action_taken = "scale_down"
                     record_action("scale_down")
-                    logging.info(f"✅ Scale down successful: {aws_result.get('old_type')} -> {aws_result.get('new_type')}")
+                    logging.info(f"Scale down successful: {aws_result.get('old_type')} -> {aws_result.get('new_type')}")
                 else:
                     logging.warning(f"Scale down skipped: {aws_result.get('reason')}")
             except Exception as e:
